@@ -19,7 +19,14 @@ def run_game():
         print current_board
         print repr(current_board)
         # prompt human for move
-        next_move = input('Enter a move as (sub_board, square): ')
+        legal_moves = current_board.get_moves()
+        while True:
+            print 'Legal moves are: %r' % legal_moves
+            next_move = input('Enter a move as (sub_board, square): ')
+            if next_move in legal_moves:
+                break
+            else:
+                print 'Illegal move'
         # update board and check for victory
         current_board.make_move(next_move)
         if check_victory(current_board):
