@@ -15,8 +15,7 @@ class SubBoard(object):
     def make_copy(self):
         # logging.debug('Sub-board copying self')
         new_sub_board = SubBoard(self.position, self.won, self.won_by)
-        for position, square in enumerate(self.board):
-            new_sub_board.board[position] = square
+        new_sub_board.board = list(self.board)  # works as a deep-copy because list members are strings!
         return new_sub_board
 
     def get_rows(self):
@@ -31,7 +30,7 @@ class SubBoard(object):
         return moves
 
     def make_move(self, position, player):
-        logging.debug('%s makes sub-board move %r on sub-board %i', player, position, self.position)
+        # logging.debug('%s makes sub-board move %r on sub-board %i', player, position, self.position)
         self.board[position] = player
         # check if the sub_board was won by this move
         self.won = True
@@ -94,7 +93,7 @@ class SubBoard(object):
             elif self.board[0] == self.board[4] == player:
                 return
         # the current move didn't win
-        logging.debug('This move did not win the sub-board')
+        # logging.debug('This move did not win the sub-board')
         self.won = False
         self.won_by = EMPTY
 
