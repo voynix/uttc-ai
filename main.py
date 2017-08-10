@@ -1,25 +1,27 @@
 
+import ai
+
 from state import *
 from util import *
 
 def run_game():
-    current_board = Board(0, X, WILDCARD_MOVE)
+    current_board = Board(X, WILDCARD_MOVE)
     current_board.create_sub_boards()
     print current_board
     while True:
         # get AI move
         moves = current_board.get_moves()
-        print moves
-        next_move = moves[3 % len(moves)]
+        logging.info('AI considering moves: %r', moves)
+        next_move = ai.explore_state(current_board)
         # update board and check for victory
         current_board.make_move(next_move)
         if check_victory(current_board):
             return
         # display board
         print current_board
-        print repr(current_board)
+        logging.debug(repr(current_board))
         # prompt human for move
-        legal_moves = current_board.get_moves()
+        legal_moves = current_board.get_moves()  # make sure this properly acknowledges wildcards
         while True:
             print 'Legal moves are: %r' % legal_moves
             next_move = input('Enter a move as (sub_board, square): ')
@@ -34,7 +36,7 @@ def run_game():
 
 def check_victory(board):
     victory = board.check_victory()
-    logging.info('Victory was %s', victory)
+    logging.debug('Victory achieved by (%s)', victory)
     if victory == X:
         print 'AI wins'
     elif victory == O:
@@ -45,5 +47,5 @@ def check_victory(board):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     run_game()

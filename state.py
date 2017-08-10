@@ -12,11 +12,18 @@ class SubBoard(object):
     def __repr__(self):
         return 'Sub-board %i: %r (won: %r, by: %s)' % (self.position, self.board, self.won, self.won_by)
 
+    def make_copy(self):
+        logging.debug('Sub-board copying self')
+        new_sub_board = SubBoard(self.position, self.won, self.won_by)
+        for position, square in enumerate(self.board):
+            new_sub_board.board[position] = square
+        return new_sub_board
+
     def get_rows(self):
         return [''.join(self.board[:3]), ''.join(self.board[3:6]), ''.join(self.board[6:])]
 
     def get_moves(self):
-        logging.info('Finding sub-board moves for sub-board %i', self.position)
+        logging.debug('Finding sub-board moves for sub-board %i', self.position)
         moves = []
         for pos, square in enumerate(self.board):
             if square == EMPTY:
@@ -24,7 +31,7 @@ class SubBoard(object):
         return moves
 
     def make_move(self, position, player):
-        logging.info('%s makes sub-board move %r on sub-board %i', player, position, self.position)
+        logging.debug('%s makes sub-board move %r on sub-board %i', player, position, self.position)
         self.board[position] = player
         # check if the sub_board was won by this move
         self.won = True
@@ -91,22 +98,32 @@ class SubBoard(object):
         self.won = False
         self.won_by = EMPTY
 
-    # TODO: copy constructors / deep copy?
+    def heuristic_eval(self):
+        logging.debug('Performing heuristic evaluation of sub-board %i' % self.position)
+        value = 0
+        if self.won:
+            value = SUB_BOARD_VICTORY_VALUE[self.won_by]
+        else:
+            for position, player in enumerate(self.board):
+                if player != EMPTY:
+                    value += SUB_BOARD_POSITION_VALUE[position][player]
+        logging.debug('Sub-board evaluation is %i' % value)
+        return value
+
+        # TODO: copy constructors / deep copy?
 
 class Board(object):
     # last_move is the sub_board square in which the last move was played
     # ie which sub_board is eligible for moves on this board
-    def __init__(self, depth, active_player, last_move):
-        self.depth = depth
+    def __init__(self, active_player, last_move):
         self.active_player = active_player
         self.sub_boards = []
         self.last_move = last_move
 
     def __repr__(self):
-        return 'Board (depth: %i, active_player: %s, last_move: %i) with sub_boards %r' % (self.depth,
-                                                                                           self.active_player,
-                                                                                           self.last_move,
-                                                                                           self.sub_boards)
+        return 'Board (active_player: %s, last_move: %i) with sub_boards %r' % (self.active_player,
+                                                                                self.last_move,
+                                                                                self.sub_boards)
 
     def __str__(self):
         line = '+---+---+---+\n'
@@ -123,12 +140,22 @@ class Board(object):
         return output
 
     def create_sub_boards(self):
-        logging.info('Creating sub-boards')
+        logging.debug('Creating sub-boards')
         for i in xrange(0, 9):
             self.sub_boards.append(SubBoard(i))
 
+    def make_copy_with_move(self, position):
+        logging.debug('Board copying self with move %r', position)
+        new_board = Board(self.active_player, self.last_move)
+        new_board.sub_boards = []
+        for sub_board in self.sub_boards:
+            new_board.sub_boards.append(sub_board.make_copy())
+        new_board.make_move(position)
+        return new_board
+
     def get_moves(self):
-        logging.info('Finding board moves')
+        logging.debug('Finding board moves')
+        # TODO: shouldn't allow play in claimed sub-boards for wildcard
         if self.last_move == WILDCARD_MOVE or self.sub_boards[self.last_move].won:  # wildcard
             logging.debug('Move is wildcard, searching all sub-boards')
             moves = []
@@ -140,14 +167,14 @@ class Board(object):
             return self.sub_boards[self.last_move].get_moves()
 
     def make_move(self, position):
-        logging.info('%s makes move %r', self.active_player, position)
+        logging.debug('%s makes move %r', self.active_player, position)
         sub_board, square = position
         self.sub_boards[sub_board].make_move(square, self.active_player)
         self.active_player = O if self.active_player == X else X
         self.last_move = square
 
     def check_victory(self):
-        logging.info('Checking for victory')
+        logging.debug('Checking for victory')
         if self.sub_boards[1].won:
             if self.sub_boards[0].won and self.sub_boards[2].won:
                 if self.sub_boards[0].won_by == self.sub_boards[1].won_by == self.sub_boards[2].won_by:
@@ -179,3 +206,15 @@ class Board(object):
                     return self.sub_boards[7].won_by
         logging.debug('No victory found')
         return EMPTY
+
+    def heuristic_eval(self):
+        logging.debug('Performing board heuristic evaluation')
+        value = 0
+        victory = self.check_victory()
+        if victory != EMPTY:
+            value = BOARD_VICTORY_VALUE[victory]
+        else:
+            for position, sub_board in enumerate(self.sub_boards):
+                value += BOARD_POSITION_VALUE[position] * sub_board.heuristic_eval()
+        logging.debug('Board evaluation is %i' % value)
+        return value
