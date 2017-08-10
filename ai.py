@@ -2,11 +2,15 @@
 from state import *
 from util import *
 
-# basic MINIMAX search
+states_explored = 0
+
+# MINIMAX search with alpha-beta pruning
 def explore_state(board, depth=0):
     logging.debug('Exploring state at depth %i' % depth)
     if depth >= MAX_DEPTH:
         logging.debug('Max depth reached')
+        global states_explored
+        states_explored += 1
         return board.heuristic_eval()
     else:
         moves = board.get_moves()
@@ -26,6 +30,8 @@ def explore_state(board, depth=0):
                 logging.debug('Move %r with value %i', move, move_value)
         # if depth 0, return best move
         if depth == 0:
+            logging.info('%i states explored', states_explored)
+            states_explored = 0
             return best_move
         # otherwise return value of best move
         else:
