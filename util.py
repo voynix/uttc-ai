@@ -5,7 +5,7 @@ EMPTY = ' '
 
 WILDCARD_MOVE = -1
 
-MAX_DEPTH = 5
+MAX_DEPTH = 6
 
 SUB_BOARD_VICTORY_VALUE = {X: 20, O: -20}
 # center > corner > side
