@@ -11,8 +11,9 @@ def run_game():
     while True:
         # get AI move
         moves = current_board.get_moves()
-        logging.info('AI considering moves: %r', moves)
+        logging.info('AI considering %i moves: %r', len(moves), moves)
         next_move = ai.explore_state(current_board)
+        print 'AI move: %s' % str(next_move)
         # update board and check for victory
         current_board.make_move(next_move)
         if check_victory(current_board):
