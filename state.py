@@ -13,7 +13,7 @@ class SubBoard(object):
         return 'Sub-board %i: %r (won: %r, by: %s)' % (self.position, self.board, self.won, self.won_by)
 
     def make_copy(self):
-        logging.debug('Sub-board copying self')
+        # logging.debug('Sub-board copying self')
         new_sub_board = SubBoard(self.position, self.won, self.won_by)
         for position, square in enumerate(self.board):
             new_sub_board.board[position] = square
@@ -99,7 +99,7 @@ class SubBoard(object):
         self.won_by = EMPTY
 
     def heuristic_eval(self):
-        logging.debug('Performing heuristic evaluation of sub-board %i' % self.position)
+        # logging.debug('Performing heuristic evaluation of sub-board %i' % self.position)
         value = 0
         if self.won:
             value = SUB_BOARD_VICTORY_VALUE[self.won_by]
@@ -107,10 +107,9 @@ class SubBoard(object):
             for position, player in enumerate(self.board):
                 if player != EMPTY:
                     value += SUB_BOARD_POSITION_VALUE[position][player]
-        logging.debug('Sub-board evaluation is %i' % value)
+        # logging.debug('Sub-board evaluation is %i' % value)
         return value
 
-        # TODO: copy constructors / deep copy?
 
 class Board(object):
     # last_move is the sub_board square in which the last move was played
@@ -145,7 +144,7 @@ class Board(object):
             self.sub_boards.append(SubBoard(i))
 
     def make_copy_with_move(self, position):
-        logging.debug('Board copying self with move %r', position)
+        # logging.debug('Board copying self with move %r', position)
         new_board = Board(self.active_player, self.last_move)
         new_board.sub_boards = []
         for sub_board in self.sub_boards:
@@ -174,7 +173,7 @@ class Board(object):
         self.last_move = square
 
     def check_victory(self):
-        logging.debug('Checking for victory')
+        # logging.debug('Checking for victory')
         if self.sub_boards[1].won:
             if self.sub_boards[0].won and self.sub_boards[2].won:
                 if self.sub_boards[0].won_by == self.sub_boards[1].won_by == self.sub_boards[2].won_by:
@@ -204,11 +203,11 @@ class Board(object):
             if self.sub_boards[6].won and self.sub_boards[8].won:
                 if self.sub_boards[6].won_by == self.sub_boards[7].won_by == self.sub_boards[8].won_by:
                     return self.sub_boards[7].won_by
-        logging.debug('No victory found')
+        # logging.debug('No victory found')
         return EMPTY
 
     def heuristic_eval(self):
-        logging.debug('Performing board heuristic evaluation')
+        # logging.debug('Performing board heuristic evaluation')
         value = 0
         victory = self.check_victory()
         if victory != EMPTY:
@@ -216,5 +215,5 @@ class Board(object):
         else:
             for position, sub_board in enumerate(self.sub_boards):
                 value += BOARD_POSITION_VALUE[position] * sub_board.heuristic_eval()
-        logging.debug('Board evaluation is %i' % value)
+        # logging.debug('Board evaluation is %i' % value)
         return value
