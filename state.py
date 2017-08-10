@@ -155,12 +155,12 @@ class Board(object):
 
     def get_moves(self):
         logging.debug('Finding board moves')
-        # TODO: shouldn't allow play in claimed sub-boards for wildcard
         if self.last_move == WILDCARD_MOVE or self.sub_boards[self.last_move].won:  # wildcard
-            logging.debug('Move is wildcard, searching all sub-boards')
+            logging.debug('Move is wildcard, searching all unclaimed sub-boards')
             moves = []
             for sub_board in self.sub_boards:
-                moves.append(sub_board.get_moves())
+                if not sub_board.won:
+                    moves.append(sub_board.get_moves())
             # flatten list and return
             return [move for sublist in moves for move in sublist]
         else:
