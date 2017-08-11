@@ -40,8 +40,8 @@ def explore_state(board, depth=0, alpha=None, beta=None):
                 if best_move_value < beta:
                     beta = best_move_value
             # debug!
-            if depth == 0:
-                logging.debug('Move %r with value %i', move, move_value)
+            # if depth == 0:
+            #     logging.debug('Move %r with value %i', move, move_value)
         # if depth 0, return best move
         if depth == 0:
             logging.info('%i states explored', states_explored)
