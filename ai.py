@@ -6,12 +6,15 @@ states_explored = 0
 
 # MINIMAX search with alpha-beta pruning
 def explore_state(board, depth=0, alpha=None, beta=None):
-    logging.debug('Exploring state at depth %i' % depth)
+    # logging.debug('Exploring state at depth %i' % depth)
     if depth >= MAX_DEPTH:
         # logging.debug('Max depth reached')
         global states_explored
         states_explored += 1
         return board.heuristic_eval()
+    elif board.check_victory() != EMPTY:
+        # logging.debug('Found victory/loss; terminating line of exploration')
+        return BOARD_VICTORY_VALUE[board.check_victory()]  # this is unlikely to run, so extra cost here is ok
     else:
         moves = board.get_moves()
         best_move, best_move_value = None, None

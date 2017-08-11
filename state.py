@@ -22,7 +22,7 @@ class SubBoard(object):
         return [''.join(self.board[:3]), ''.join(self.board[3:6]), ''.join(self.board[6:])]
 
     def get_moves(self):
-        logging.debug('Finding sub-board moves for sub-board %i', self.position)
+        # logging.debug('Finding sub-board moves for sub-board %i', self.position)
         moves = []
         for pos, square in enumerate(self.board):
             if square == EMPTY:
@@ -103,6 +103,7 @@ class SubBoard(object):
         if self.won:
             value = SUB_BOARD_VICTORY_VALUE[self.won_by]
         else:
+            # TODO: make this faster!
             for position, player in enumerate(self.board):
                 if player != EMPTY:
                     value += SUB_BOARD_POSITION_VALUE[position][player]
@@ -152,9 +153,9 @@ class Board(object):
         return new_board
 
     def get_moves(self):
-        logging.debug('Finding board moves')
+        # logging.debug('Finding board moves')
         if self.last_move == WILDCARD_MOVE or self.sub_boards[self.last_move].won:  # wildcard
-            logging.debug('Move is wildcard, searching all unclaimed sub-boards')
+            # logging.debug('Move is wildcard, searching all unclaimed sub-boards')
             moves = []
             for sub_board in self.sub_boards:
                 if not sub_board.won:
@@ -165,7 +166,7 @@ class Board(object):
             return self.sub_boards[self.last_move].get_moves()
 
     def make_move(self, position):
-        logging.debug('%s makes move %r', self.active_player, position)
+        # logging.debug('%s makes move %r', self.active_player, position)
         sub_board, square = position
         self.sub_boards[sub_board].make_move(square, self.active_player)
         self.active_player = O if self.active_player == X else X
