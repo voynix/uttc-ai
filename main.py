@@ -43,7 +43,10 @@ def check_victory(board):
     elif victory == O:
         print 'Human wins'
     if victory == EMPTY:
-        return False
+        if len(board.get_moves()) == 0:
+            return 'Draw'
+        else:
+            return False
     return True
 
 
