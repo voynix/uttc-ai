@@ -99,14 +99,10 @@ class SubBoard(object):
 
     def heuristic_eval(self):
         # logging.debug('Performing heuristic evaluation of sub-board %i' % self.position)
-        value = 0
         if self.won:
             value = SUB_BOARD_VICTORY_VALUE[self.won_by]
         else:
-            # TODO: make this faster!
-            for position, player in enumerate(self.board):
-                if player != EMPTY:
-                    value += SUB_BOARD_POSITION_VALUE[position][player]
+            value = SUB_BOARD_VALUES[tuple(self.board)]
         # logging.debug('Sub-board evaluation is %i' % value)
         return value
 

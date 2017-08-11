@@ -26,7 +26,7 @@ def explore_state(board, depth=0, alpha=None, beta=None):
             move_value = explore_state(new_board, depth + 1, alpha, beta)
             # compare to best
             if best_move is None or board.active_player == X and move_value > best_move_value or board.active_player == O and move_value < best_move_value:
-                logging.debug('Found new best move %r with value %i at depth %i', move, move_value, depth)
+                # logging.debug('Found new best move %r with value %i at depth %i', move, move_value, depth)
                 best_move, best_move_value = move, move_value
             # alpha-beta pruning
             if board.active_player == X:
@@ -49,5 +49,5 @@ def explore_state(board, depth=0, alpha=None, beta=None):
             return best_move
         # otherwise return value of best move
         else:
-            logging.debug('Found new best move %r with value %i at depth %i', best_move, best_move_value, depth)
+            # logging.debug('Found new best move %r with value %i at depth %i', best_move, best_move_value, depth)
             return best_move_value
