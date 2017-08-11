@@ -5,12 +5,15 @@ from util import *
 class SubBoard(object):
     def __init__(self, position, won=False, won_by=EMPTY):
         self.position = position
-        self.board = list(EMPTY * 9)
+        self.board = None
         self.won = won
         self.won_by = won_by
 
     def __repr__(self):
         return 'Sub-board %i: %r (won: %r, by: %s)' % (self.position, self.board, self.won, self.won_by)
+
+    def make_board(self):
+        self.board = list(EMPTY * 9)
 
     def make_copy(self):
         # logging.debug('Sub-board copying self')
@@ -137,12 +140,13 @@ class Board(object):
     def create_sub_boards(self):
         logging.debug('Creating sub-boards')
         for i in xrange(0, 9):
-            self.sub_boards.append(SubBoard(i))
+            new_sub_board = SubBoard(i)
+            new_sub_board.make_board()
+            self.sub_boards.append(new_sub_board)
 
     def make_copy_with_move(self, position):
         # logging.debug('Board copying self with move %r', position)
         new_board = Board(self.active_player, self.last_move)
-        new_board.sub_boards = []
         for sub_board in self.sub_boards:
             new_board.sub_boards.append(sub_board.make_copy())
         new_board.make_move(position)
