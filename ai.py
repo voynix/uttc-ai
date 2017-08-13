@@ -14,10 +14,17 @@ def explore_state(board, depth=0, alpha=None, beta=None):
         return board.heuristic_eval()
     elif board.check_victory() != EMPTY:
         # logging.debug('Found victory/loss; terminating line of exploration')
-        return BOARD_VICTORY_VALUE[board.check_victory()]  # this is unlikely to run, so extra cost here is ok
+        value = BOARD_VICTORY_VALUE[board.check_victory()]  # this is unlikely to run, so extra cost here is ok
+        # devalue victories based on depth, so earlier victories are worth more
+        if board.active_player == X:
+            value -= depth
+        else:  # active_player == O
+            value += depth
+        return value
     else:
         moves = board.get_moves()
         best_move, best_move_value = None, None
+        # TODO: handle what happens if len(board.get_moves()) == 0 ie draw?
         for move in moves:
             # logging.debug('Exploring moves below %r at depth %i', move, depth)
             # make new board with move
