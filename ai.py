@@ -27,10 +27,12 @@ def explore_state(board, depth=0, alpha=None, beta=None):
         # TODO: handle what happens if len(board.get_moves()) == 0 ie draw?
         for move in moves:
             # logging.debug('Exploring moves below %r at depth %i', move, depth)
-            # make new board with move
-            new_board = board.make_copy_with_move(move)
+            # add move to board
+            board.make_move(move)
             # recurse w/ depth + 1
-            move_value = explore_state(new_board, depth + 1, alpha, beta)
+            move_value = explore_state(board, depth + 1, alpha, beta)
+            # undo move
+            board.undo_move(move)
             # compare to best
             if best_move is None or board.active_player == X and move_value > best_move_value or board.active_player == O and move_value < best_move_value:
                 # logging.debug('Found new best move %r with value %i at depth %i', move, move_value, depth)

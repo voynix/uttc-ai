@@ -5,7 +5,7 @@ from state import *
 from util import *
 
 def run_game():
-    current_board = Board(X, WILDCARD_MOVE)
+    current_board = Board(X, WILDCARD_MOVE, [])
     current_board.create_sub_boards()
     print current_board
     while True:

@@ -100,6 +100,12 @@ class SubBoard(object):
         self.won = False
         self.won_by = EMPTY
 
+    def undo_move(self, position):
+        # logging.debug('Undoing sub-board move %r on sub-board %i', position, self.position)
+        self.board[position] = EMPTY
+        self.won = False
+        self.won_by = EMPTY
+
     def heuristic_eval(self):
         # logging.debug('Performing heuristic evaluation of sub-board %i' % self.position)
         if self.won:
@@ -113,10 +119,11 @@ class SubBoard(object):
 class Board(object):
     # last_move is the sub_board square in which the last move was played
     # ie which sub_board is eligible for moves on this board
-    def __init__(self, active_player, last_move):
+    def __init__(self, active_player, last_move, last_moves):
         self.active_player = active_player
         self.sub_boards = []
         self.last_move = last_move
+        self.last_moves = last_moves
 
     def __repr__(self):
         return 'Board (active_player: %s, last_move: %i) with sub_boards %r' % (self.active_player,
@@ -125,7 +132,7 @@ class Board(object):
 
     def __str__(self):
         line = '+---+---+---+\n'
-        row_line = '+%s|%s|%s+\n'
+        row_line = '|%s|%s|%s|\n'
         rows = dict()
         for index, sub_board in enumerate(self.sub_boards):
             rows[index] = sub_board.get_rows()
@@ -146,7 +153,7 @@ class Board(object):
 
     def make_copy_with_move(self, position):
         # logging.debug('Board copying self with move %r', position)
-        new_board = Board(self.active_player, self.last_move)
+        new_board = Board(self.active_player, self.last_move, self.last_moves)
         for sub_board in self.sub_boards:
             new_board.sub_boards.append(sub_board.make_copy())
         new_board.make_move(position)
@@ -171,6 +178,14 @@ class Board(object):
         self.sub_boards[sub_board].make_move(square, self.active_player)
         self.active_player = O if self.active_player == X else X
         self.last_move = square
+        self.last_moves.append(square)
+
+    def undo_move(self, position):
+        # logging.debug('Undoing move %r', position)
+        sub_board, square = position
+        self.sub_boards[sub_board].undo_move(square)
+        self.active_player = O if self.active_player == X else X
+        self.last_move = self.last_moves.pop()
 
     def check_victory(self):
         # logging.debug('Checking for victory')
